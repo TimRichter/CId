@@ -21,8 +21,11 @@ Definition of graphs, construction of the free category on a graph.
 ### FinSet.lidr
 
 The category (or rather a sceleton of the category) of finite sets:
-Nat is the type of objects, Hom m n is Vect m (Fin n)  
-(rather than (Fin m) -> (Fin n)) to have function extensionality...
+
+Nat is the type of objects. 
+
+Hom m n is Vect m (Fin n) (rather than (Fin m) -> (Fin n)) 
+to have function extensionality...
 
 Still incomplete.
 
