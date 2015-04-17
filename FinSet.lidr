@@ -8,42 +8,48 @@
 
 Goal: define the category of finite sets
 
-the identity vector
+To get extensional equality of functions (Fin m) -> (Fin n),
+we identify such f with the vector [f(0),...,f(m-1)], i.e. an
+element of Vect m (Fin n)
+
+the identity functions then become
 
 > idVect : (n:Nat) -> Vect n (Fin n)
 > idVect Z = []
 > idVect (S n) = FZ :: map FS (idVect n)
 
-> lookup : {m:Nat} -> {A:Type} -> (Vect m A) -> Fin m -> A
-> lookup {m=Z}      _        x       = absurd x
-> lookup {m=(S m')} (a::_)   FZ      = a
-> lookup {m=(S m')} (_::as) (FS x')  = lookup as x'
+composition
 
+> pick : {m:Nat} -> {A:Type} -> (Vect m A) -> Fin m -> A
+> pick {m=Z}      _        x       = absurd x
+> pick {m=(S m')} (a::_)   FZ      = a
+> pick {m=(S m')} (_::as) (FS x')  = pick as x'
 
 > compVect : {l:Nat} -> {m:Nat} -> {n:Nat} ->
 >            (Vect m (Fin n)) -> (Vect l (Fin m)) -> 
 >            (Vect l (Fin n))
 > compVect {l=Z}      _  _       = []
-> compVect {l=(S l')} f (gZ::gR) = (lookup f gZ) :: (compVect f gR)
+> compVect {l=(S l')} f (gZ::gR) = (pick f gZ) :: (compVect f gR)
 
-> lookupLemma : {l:Nat} -> {m:Nat} -> {n:Nat} ->
+
+for the associativity proof, we'll need
+
+> pickLemma : {l:Nat} -> {m:Nat} -> {n:Nat} ->
 >            (f: Vect m (Fin n)) -> (g: Vect l (Fin m)) -> 
 >            (x: Fin l) ->
->            lookup (compVect f g) x = lookup f (lookup g x)
+>            pick (compVect f g) x = pick f (pick g x)
+>
+> pickLemma {l=Z} _ _ x                    = absurd x
+> pickLemma {l=(S l')} f (gZ::gR) FZ       = Refl
+> pickLemma {l=(S l')} f (gZ::gR) (FS x')  = pickLemma {l=l'} f gR x'
+     
 
- lookupLemma {l=Z} _ _ x       = absurd x
- lookupLemma {l=(S l')} f g FZ =
-     lookup (compVect f g) FZ
-     ={ Refl }= 
-     ...
-
-
-> compVectAss : {k:Nat} -> {l:Nat} -> {m:Nat} -> {n:Nat} ->
->          (f: Vect m (Fin n)) -> (g: Vect l (Fin m)) -> 
->          (h: Vect k (Fin l)) ->
->          (compVect (compVect f g) h) = (compVect f (compVect g h))
-> compVectAss {k=Z} _ _ _ = Refl
-> compVectAss {k=(S k')} f g (hZ::hR) = ?cva
+ compVectAss : {k:Nat} -> {l:Nat} -> {m:Nat} -> {n:Nat} ->
+          (f: Vect m (Fin n)) -> (g: Vect l (Fin m)) -> 
+          (h: Vect k (Fin l)) ->
+          (compVect (compVect f g) h) = (compVect f (compVect g h))
+ compVectAss {k=Z} _ _ _ = Refl
+ compVectAss {k=(S k')} f g (hZ::hR) = ?cva
 
 > finC : Cat
 > finC = MkCat Nat                        -- objects
@@ -55,8 +61,9 @@ the identity vector
 >              ?idPost
 
 Thorsten said FinSet can be given the structure of
-a category with families, see Dybjer "Internal Type Theory",
-he proposed to start with these (but then...?):
+a category with families, see Dybjer "Internal Type Theory"
+(and also Hofmann: "Syntax and Semantics of Dependent Types"),
+He proposed to start with
 
 > inl : (m:Nat) -> (n:Nat) -> Fin m -> Fin (m + n)
 > inl Z      n x       = absurd x
