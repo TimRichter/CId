@@ -25,7 +25,7 @@ The category (or rather a sceleton of the category) of finite sets:
 Nat is the type of objects. 
 
 Hom m n is Vect m (Fin n) (rather than (Fin m) -> (Fin n)) 
-to have function extensionality...
+to have function extensionality.
 
-Still incomplete.
+Typechecks, but ugly proofs using many tiny lemmas... needs more work.
 
