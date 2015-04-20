@@ -27,5 +27,3 @@ Nat is the type of objects.
 Hom m n is Vect m (Fin n) (rather than (Fin m) -> (Fin n)) 
 to have function extensionality.
 
-Typechecks, but ugly proofs using many tiny lemmas... needs more work.
-
