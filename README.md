@@ -14,16 +14,53 @@ Just do a "cabal update",  "cabal install Idris" and clone this repo.
 
 Definitions of a category, a functor, a natural transformation.
 
+### Graph.lidr
+
+Defines type of directed graphs
+
 ### FreeCatOnGraph.lidr
 
-Definition of graphs, construction of the free category on a graph.
+Construction of the free category on a directed graph.
 
-### FinSet.lidr
+### EqCat.lidr
 
-The category (or rather a sceleton of the category) of finite sets:
+The discrete category on a type: morphisms are the equalities.
+
+### TypeCat.lidr
+
+Type is a category with maps as morphisms.
+
+### FinSCat.lidr
+
+A sceleton of the category of finite sets:
 
 Nat is the type of objects. 
 
 Hom m n is Vect m (Fin n) (rather than (Fin m) -> (Fin n)) 
 to have function extensionality.
+
+### DecProp.lidr
+
+Attempt to model decidable propositions using typeclasses.
+Not really used so far...
+
+### Prop.lidr
+
+Defines IsProp and proves Uip in some variants.
+
+### Preorder.lidr
+
+Preorders (without Categories). May be unnecessary.
+
+### FunExtAxiom.lidr
+
+Function extensionality axiom. Needed for FunCat and CatCat.
+
+### FunCat.lidr
+
+Functor category ... incomplete.
+
+### CatCat.lidr
+
+Category of categories ... incomplete.
 
