@@ -17,12 +17,12 @@ function composition is associative
 
 
 > idPre : {A, B : Type} -> (f : A -> B) -> 
->         (f . id) = f
+>         (f . Prelude.Basics.id) = f
 > idPre f = Refl
 
 > idPost : {A, B : Type} -> (f : A -> B) -> 
->         ((id {a = B}). f) = f
-> idPost f = Refl  -- soon
+>         ((Prelude.Basics.id {a = B}). f) = f
+> idPost f = Refl
 
 Can't write (->) ... why?
 

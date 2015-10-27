@@ -5,8 +5,7 @@ This is an attempt to formalize some elementary category
 theory in Idris, to be used in a lecture at Universität Potsdam
 in summer 2015. Let's see how far we get.
 
-Supposed to work with the latest cabal version of Idris:
-Just do a "cabal update",  "cabal install Idris" and clone this repo.
+Typechecks (mostly, see below) in Idris Version 0.9.19.1
 
 ## What's in the files:
 
@@ -42,6 +41,7 @@ to have function extensionality.
 ### DecProp.lidr
 
 Attempt to model decidable propositions using typeclasses.
+Doesn't typecheck.
 Not really used so far...
 
 ### Prop.lidr
