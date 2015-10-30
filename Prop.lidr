@@ -11,14 +11,14 @@ the type are equal:
 Heterogeneous variant (useful?)
 
 > IsPropH : Type -> Type -> Type
-> IsPropH t1 t2 = (p: t1) -> (q : t2) -> p = q
+> IsPropH t1 t2 = (p : t1) -> (q : t2) -> p = q
 
-Void is obviously a proposition
+Void is a proposition
 
 > VoidIsProp : IsProp Void
 > VoidIsProp p q = absurd p
 
-and Unit as well
+Unit is a proposition
 
 > UnitIsProp : IsProp ()
 > UnitIsProp () () = Refl
@@ -54,7 +54,5 @@ The Sigma type of a Praedicate over A is a Subset
 
 > EmptySubSet : {A : Type} -> Type
 > EmptySubSet {A} = SubSet (EmptyPraed {A})
-
-
 
 

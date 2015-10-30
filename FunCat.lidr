@@ -1,6 +1,7 @@
 > module FunCat
 > import Category
 > import FunExtAxiom
+> import Prop
 > import Syntax.PreorderReasoning
 
 > %default total
@@ -11,19 +12,21 @@ have the category of functors Funs cc dd
 identity natural transformation:
 
 > idNT :  (ff : Fun cc dd) -> NT ff ff
-> idNT {cc} {dd} ff = MkNT cmpId commSqId where
+> idNT {cc} {dd} ff = MkNT  (cmpId ff) 
+>                           (commSqId ff) where
 >
->   cmpId : (a : Obj cc) -> Hom dd (FO ff a) (FO ff a)
->   cmpId a = Id (FO ff a)
+>   cmpId : (ff: Fun cc dd) -> 
+>           (a : Obj cc) -> Hom dd (FO ff a) (FO ff a)
+>   cmpId ff a = Category.Id (FO ff a)
 >
->   commSqId :  (f : Hom cc a b) ->               
->               ((cmpId b) ° (FH ff f)) = ((FH ff f) ° (cmpId a))
->   commSqId {a} {b} f =
->     ((cmpId b) ° (FH ff f))       ={ Refl }=
+>   commSqId :  (ff: Fun cc dd) -> {a, b : Obj cc} -> (f : Hom cc a b) ->               
+>               ((cmpId ff b) ° (FH ff f)) = ((FH ff f) ° (cmpId ff a))
+>   commSqId ff {a} {b} f =
+>     ((cmpId ff b) ° (FH ff f))    ={ Refl }=
 >     ((Id (FO ff b)) ° (FH ff f))  ={ IdPost (FH ff f) }=
 >     (FH ff f)                     ={ sym (IdPre (FH ff f)) }=
 >     ((FH ff f) ° (Id (FO ff a)))  ={ Refl }=
->     ((FH ff f) ° (cmpId a))       QED
+>     ((FH ff f) ° (cmpId ff a))    QED
 
 composition of natural transformations:
 
@@ -57,26 +60,43 @@ of the transformations being composed
 
 associativity of compNT
 
-> assLemma1 : {cc, dd : Cat} -> {ff,gg,hh,kk: Fun cc dd} ->
->       (t : NT hh kk) -> (r : NT gg hh) -> (s : NT ff gg) ->
->       (a : Obj cc) -> 
->       NTC (compNT (compNT t r) s) a = NTC (compNT t (compNT r s)) a 
+first the components
 
-> assLemma1 t r s a = 
->     (NTC (compNT (compNT t r) s) a)   ={ Refl }=
->     (((t _ a) ° (r _ a)) ° (s _ a))   ={ Ass (t _ a) (r _ a) (s _ a) }=
->     ((t _ a) ° ((r _ a) ° (s _ a)))   ={ Refl }=
->     (NTC (compNT t (compNT r s)) a)   QED
+> assCLemma : {cc, dd : Cat} -> 
+>             {ff, gg, hh, kk: Fun cc dd} ->
+>             (t : NT hh kk) -> 
+>             (r : NT gg hh) -> 
+>             (s : NT ff gg) ->
+>             NTC (compNT (compNT t r) s) = NTC (compNT t (compNT r s))
+> assCLemma {cc} {dd} {ff} {gg} {hh} {kk} t r s = 
+>     funextD {A = Obj cc} 
+>             {B1 = \a => Hom dd (FO ff a) (FO kk a)}
+>             {B2 = \a => Hom dd (FO ff a) (FO kk a)} 
+>             (NTC (compNT (compNT t r) s))
+>             (NTC (compNT t (compNT r s)))
+>             (\a => Ass (t _ a) (r _ a) (s _ a))
 
-> assLemma2 : {cc, dd : Cat} -> {ff,gg,hh,kk: Fun cc dd} ->
->       (t : NT hh kk) -> (r : NT gg hh) -> (s : NT ff gg) ->
->       NTC (compNT (compNT t r) s) = NTC (compNT t (compNT r s))
-> assLemma2 t r s = funext (NTC (compNT (compNT t r) s)) 
->                          (NTC (compNT t (compNT r s)))
->                          (assLemma1 t r s)
+then the squares
+
+> assSqLemma : {cc, dd : Cat} -> 
+>             {ff, gg, hh, kk: Fun cc dd} ->
+>             (t : NT hh kk) -> 
+>             (r : NT gg hh) -> 
+>             (s : NT ff gg) ->
+>             NTSq (compNT (compNT t r) s) = NTSq (compNT t (compNT r s))
+> assSqLemma {cc} {dd} {ff} {gg} {hh} {kk} t r s =  
+>     funextD {A = Hom cc a b}
+>             
+>             (NTSq (compNT (compNT t r) s))
+>             (NTSq (compNT t (compNT r s)))
+>             (\f => Uip ())
+
+
 
 
 > FunCat : (cc, dd : Cat) -> Cat
 > FunCat cc dd = MkCat
->   (Fun cc dd) (NT {cc} {dd}) idNT compNT ?ass1 ?idPre ?idPost 
+>   (Fun cc dd) (NT {cc} {dd}) (idNT {cc} {dd}) (compNT {cc} {dd}) ?ass ?idPre ?idPost 
+
+
 
