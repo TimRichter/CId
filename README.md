@@ -64,3 +64,8 @@ Functor category ... incomplete.
 
 Category of categories ... incomplete.
 
+### DependentCurrying
+
+Helper functions to establish the equivalence of
+dependent functions on Sigma-Types and dependent 
+functions of several variables
