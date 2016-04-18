@@ -4,7 +4,7 @@
 
 > %default total 
 
-decidable props, praedicates a.s.o. with type classes
+decidable props, praedicates a.s.o. with type interfaces
 =====================================================
 
 Remark: depends on a "really_believe_me" to proof
@@ -15,49 +15,49 @@ Remark: depends on a "really_believe_me" to proof
 propositions
 ------------
 
-> class Prop a where
+> interface Prop a where
 >   isProp : (x, y : a) -> x = y
 
-> instance Prop Void where
+> implementation Prop Void where
 >   isProp x _ = absurd x
 
-> instance Prop Unit where
+> implementation Prop Unit where
 >   isProp () () = Refl
 
-> instance Uninhabited a => Prop a where
+> implementation Uninhabited a => Prop a where
 >   isProp x _ = absurd x
 
 UIP
 
-> instance Prop ((=) {A=a} {B=a} x y) where
+> implementation Prop ((=) {A=a} {B=a} x y) where
 >   isProp Refl Refl = Refl
 
 decidable propositions
 ----------------------
 
-> class Prop a => DecProp a where
+> interface Prop a => DecProp a where
 >   decide : Dec a
 
 logic of decidable propositions
 -------------------------------
 
-> instance DecProp Void where
+> implementation DecProp Void where
 >   decide = No id
 
-> instance DecProp Unit where
+> implementation DecProp Unit where
 >   decide = Yes ()
 
 Negation of a decidable proposition
 is a proposition (or, should be ... believe me...) 
 
-> instance DecProp a => Prop (Not a) where
+> implementation DecProp a => Prop (Not a) where
 >   isProp {a} f g = case decide {a} of
 >     Yes x => absurd (f x)
 >     No h  => really_believe_me h
 
 and it is decidable
 
-> instance DecProp b => DecProp (Not b) where
+> implementation DecProp b => DecProp (Not b) where
 >   decide = decNot decide where
 >     decNot : {a : Type} -> Dec a -> Dec (Not a)
 >     decNot  (Yes x    ) = No (\notx => notx x)
@@ -70,13 +70,13 @@ Conjunction
 
 > syntax [a] "/\\" [b] = AND a b 
 
-> instance (Prop a, Prop b) => Prop (a /\ b) where
+> implementation (Prop a, Prop b) => Prop (a /\ b) where
 >   isProp (x,y) (x',y') = 
 >     (x ,y )   ={ cong {f = \x => (x,y)}  (isProp x x') }=
 >     (x',y )   ={ cong {f = \y => (x',y)} (isProp y y') }=
 >     (x',y')   QED
 
-> instance (DecProp a, DecProp b) => DecProp (a /\ b) where
+> implementation (DecProp a, DecProp b) => DecProp (a /\ b) where
 >   decide = case decide {a = a} of
 >     Yes prfa  => case decide {a = b} of
 >       Yes prfb  => Yes (prfa,prfb)
@@ -92,7 +92,7 @@ Disjunction
 
 > syntax [a] "\\/" [b] = OR a b 
 
-> instance (DecProp a, DecProp b) => Prop (a \/ b) where
+> implementation (DecProp a, DecProp b) => Prop (a \/ b) where
 >   isProp p1 p2 with (decide {a = a}, decide {a = b})
 >     isProp (Both x y) (Both x' y') | (Yes _, Yes _) =
 >       (Both x  y)   
@@ -125,7 +125,7 @@ Disjunction
 >     isProp _ (RightO _  y)  | (_    , No ny) = absurd (ny y)
 >     isProp _ (LeftO  _ ny)  | (_    , Yes y) = absurd (ny y)
   
-> instance (DecProp a, DecProp b) => DecProp (a \/ b) where
+> implementation (DecProp a, DecProp b) => DecProp (a \/ b) where
 >   decide with (decide {a = a}, decide {a = b})
 >     | (Yes x, Yes y) = Yes (Both x y)
 >     | (Yes x, No ny) = Yes (LeftO x ny)
@@ -161,35 +161,35 @@ a prepredicate is just a type family on a
 > unwrap : PrePred a -> (a -> Type)
 > unwrap (MkPrePred P) = P
 
-> class Pred a (P : PrePred a) where 
+> interface Pred a (P : PrePred a) where 
 >   isPred : (z : a) -> (x, y : (unwrap P) z) -> x = y
 
-> class Pred a P => DecPred a (P : PrePred a) where
+> interface Pred a P => DecPred a (P : PrePred a) where
 >   decideAt : (z : a) -> Dec ((unwrap P) z)
 
 > Empty : {a : Type} -> PrePred a
 > Empty {a} = MkPrePred (\x => Void)
 
-> instance Pred a (Empty {a}) where
+> implementation Pred a (Empty {a}) where
 >   isPred z = isProp
 
-> instance DecPred a (Empty {a}) where
+> implementation DecPred a (Empty {a}) where
 >   decideAt z = decide
 
 > Full : {a : Type} -> PrePred a
 > Full {a} = MkPrePred (\x => ())
 
-> instance Pred a (Full {a}) where
+> implementation Pred a (Full {a}) where
 >   isPred z = isProp
 
-> instance DecPred a (Full {a}) where
+> implementation DecPred a (Full {a}) where
 >   decideAt z = decide
 
 decidable relations a -> b are decidable predicates on a x b
 
-> class Pred (a,b) P => DecRel a b (P : PrePred (a,b))  where { }
+> interface Pred (a,b) P => DecRel a b (P : PrePred (a,b))  where { }
 
-> class Pred (a,a) P => DecBinRel a (P : PrePred (a,a)) where { }
+> interface Pred (a,a) P => DecBinRel a (P : PrePred (a,a)) where { }
 
 
 > Singleton : {a : Type} -> (x : a) -> PrePred a
@@ -198,11 +198,11 @@ decidable relations a -> b are decidable predicates on a x b
 > data BoolPred : Type -> Type where
 >   MkBoolPred : {a : Type} -> (a -> Bool) -> BoolPred a
 
-> instance Pred a (Singleton x) where
+> implementation Pred a (Singleton x) where
 >   isPred z = isProp
 
 doesn't work yet:
-< instance Eq a => DecPred a (Singleton x) where
+< implementation Eq a => DecPred a (Singleton x) where
 <   decideAt z = if (x == z) then Yes Refl else ?lala
 
 any boolean predicate on a generates a decidable predicate on a:
@@ -210,5 +210,5 @@ any boolean predicate on a generates a decidable predicate on a:
 > predFromBPred : {a : Type} -> (a -> Bool) -> PrePred a
 > predFromBPred bp = MkPrePred (\x => bp x = True)
 
-< instance Pred a (predFromBPred 
+< implementation Pred a (predFromBPred 
 

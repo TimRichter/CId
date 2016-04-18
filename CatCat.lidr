@@ -107,12 +107,40 @@ that are proved equal
 >       ((a: Obj cc) -> Hom dd (gO a) (gO a))
 >       QED
 
-> funEqP0 : {cc, dd: Cat} -> (ff, gg: Fun cc dd) ->
->         (eqO : (FO ff) = (FO gg)) -> 
->         (eqH : (FH ff) = (FH gg)) ->        
->         (a : Obj cc) -> FId ff a = FId gg a
-> funEqP0 (MkFun fO fH fI fC) (MkFun g0 gH gI gC) eqO eqH a = 
->         UipWTH  {teq = ?three} ?one ?two (fI a) (gI a)
+< funEqP0 : {cc, dd: Cat} -> (ff, gg: Fun cc dd) ->
+<         (eqO : (FO ff) = (FO gg)) -> 
+<         (eqH : (FH ff) = (FH gg)) ->        
+<         (a : Obj cc) -> FId ff a = FId gg a
+< funEqP0 {cc} {dd} (MkFun fO fH fI fC) (MkFun gO gH gI gC) eqO eqH a = 
+<     (FId (MkFun fO fH fI fC) a)  ={ Refl }=
+<     (fI a)                       
+
+
+?lala where
+
+>           -- types: goal: fI a = gI a
+>           --        (fI a) : fH (Id a) = Id (fO a)
+>           --        (gI a) : gH (Id a) = Id (gO a)
+>           --    i.e. suffices
+>           --           IsPropH (fH (Id a) = Id (fO a)) (gH (Id a) = Id (gO a))
+>           --        fH (Id a) : Hom dd (fO a) (fO a)
+>           --        gH (Id a) : Hom dd (gO a) (gO a)
+
+         UipWTH2 teq1 teq1 eq1 eq2 (fI a) (gI a) where
+
+           eqOa : (fO a) = (gO a)
+           eqOa = ?lulu
+
+
+cong {f = \fObj => fObj a} eqO
+
+
+           -- teq1 : (Hom dd (fO a) (fO a))  =  (Hom dd (gO a) (gO a))
+           teq1 = cong {f = \obj => Hom dd obj obj} eqOa 
+           -- eq1 : (fH (Id a)) = (gH (Id a))
+           eq1 = cong {f = \fHom => fHom (Id a)} eqH
+           -- eq2 : (Id (fO a)) = (Id (gO a))
+           eq2 = cong {f = Id} eqOa
 
 < funEqP1 : {cc, dd: Cat} -> (ff, gg: Fun cc dd) ->
 <         (eqO : (FO ff) = (FO gg)) -> 

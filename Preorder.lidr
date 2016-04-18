@@ -50,11 +50,12 @@ prefix order on lists
 (we need the element type to have a decidable equality)
 
 > lPre : DecEq a => BinRelB (List a)
-> lPre []      []      = True
-> lPre []      (y::ys) = True
-> lPre (x::xs) (y::ys) = case decEq x y of
->   Yes _ => lPre xs ys
->   No  _ => False
+> lPre []      _       = True
+> lPre (x::xs) []      = False
+> lPre (x::xs) (y::ys) 
+>   with (decEq x y)
+>   | Yes _ = lPre xs ys
+>   | No  _ = False
 
 But properties of relations are difficult to implement, e.g.:
 
@@ -90,22 +91,22 @@ the "all" relation:
 > BinRel : Type -> Type
 > BinRel A = Rel A A
 
-> data isRefl : {A : Type} -> BinRel A -> Type where
+> data IsRefl : {A : Type} -> BinRel A -> Type where
 >   PrfRefl : -- if for a relation r on A
 >             {A : Type} -> {r : BinRel A} ->
 >             -- we provide for each x in A an element of (r x x)
 >             ( (x : A) -> r x x ) ->
 >             -- then we have proved reflexivity of r
->             (isRefl r)
+>             (IsRefl r)
 
-> data isTrans : {A : Type} -> BinRel A -> Type where
+> data IsTrans : {A : Type} -> BinRel A -> Type where
 >   PrfTrans :  -- if for a relation r on A
 >               {A : Type} -> {r : BinRel A} ->        
 >               -- for any x,y,z in A, given proofs (r x y) and (r y z)
 >               -- we can produce a proof of (r x z)
 >               ({x, y, z : A} -> r x y -> r y z -> r x z ) ->   
 >               -- then we have proved transitivity of r
->               (isTrans r)                          
+>               (IsTrans r)                          
 
 
 Preorder

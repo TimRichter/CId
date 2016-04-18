@@ -36,6 +36,20 @@ Any equality type in Idris is a proposition
 >          (asEq : a1 = a2) -> (bsEq: b1 = b2) -> IsPropH (a1 = b1) (a2 = b2)
 > UipWTH {teq = Refl} Refl Refl Refl Refl = Refl
 
+heterogeneous equality implies type equality
+
+> eqToTypeEq : {A, B : Type} -> {a : A} -> {b : B} -> (a = b) -> A = B
+> eqToTypeEq Refl = Refl
+
+> UipWTH2 : {A1, A2, B1, B2 : Type} -> 
+>           {a1 : A1} -> {a2 : A2} -> {b1 : B1} -> {b2 : B2} -> 
+>           (teq1 : A1 = B1) -> (teq2 : A2 = B2) ->
+>           (a1 = a2) -> (b1 = b2) -> IsPropH (a1 = b1) (a2 = b2)
+> UipWTH2 Refl Refl Refl Refl Refl Refl = Refl
+
+
+
+
 For subsets we also need families of Props, aka
 Praedicates
 

@@ -2,10 +2,9 @@
 a little category theory in Idris
 
 This is an attempt to formalize some elementary category
-theory in Idris, to be used in a lecture at Universität Potsdam
-in summer 2015. Let's see how far we get.
+theory in Idris. Let's see how far we get.
 
-Typechecks (mostly, see below) in Idris Version 0.9.19.1
+Typechecks (mostly, see below) in Idris Version 0.10
 
 ## What's in the files:
 
@@ -40,7 +39,7 @@ to have function extensionality.
 
 ### DecProp.lidr
 
-Attempt to model decidable propositions using typeclasses.
+Attempt to model decidable propositions using interfaces.
 Doesn't typecheck.
 Not really used so far...
 
