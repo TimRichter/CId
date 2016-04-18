@@ -6,6 +6,8 @@
 
 
 > %default total
+> %auto_implicits off
+> %access public export
 
 Category of (small) categories and functors as morphisms
 --------------------------------------------------------
@@ -18,7 +20,7 @@ types as objects and as homs.
 it preserves identities:
 
 > fid : {cc, dd, ee : Cat} ->
->       (ff : Fun dd ee) -> (gg : Fun cc dd) -> 
+>       (ff : Func dd ee) -> (gg : Func cc dd) -> 
 >       (c : Obj cc) -> 
 >       ((FH {a = (FO gg c)} {b = (FO gg c)} ff) . (FH gg)) (Id c) = 
 >         Id (((FO ff).(FO gg)) c)
@@ -34,7 +36,7 @@ it preserves identities:
 
 and composition:
 
-> comp :  {cc, dd, ee : Cat} -> (ff : Fun dd ee) -> (gg : Fun cc dd) -> 
+> comp :  {cc, dd, ee : Cat} -> (ff : Func dd ee) -> (gg : Func cc dd) -> 
 >         {a, b, c: Obj cc} -> (f : Hom cc b c) -> (g : Hom cc a b) ->
 >         (FH ff (FH gg (Comp f g)))
 >             = Comp (FH ff (FH gg f)) (FH ff (FH gg g))
@@ -49,8 +51,9 @@ and composition:
 
 so we can define
 
-> funComp : (ff : Fun dd ee) -> (gg : Fun cc dd) -> Fun cc ee
-> funComp ff gg =  MkFun  ((FO ff) . (FO gg))
+> funComp : {cc, dd, ee : Cat} ->
+>           (ff : Func dd ee) -> (gg : Func cc dd) -> Func cc ee
+> funComp ff gg =  MkFunc  ((FO ff) . (FO gg))
 >                         ((FH ff) . (FH gg))
 >                         (fid ff gg)
 >                         (comp ff gg)
@@ -107,12 +110,12 @@ that are proved equal
 >       ((a: Obj cc) -> Hom dd (gO a) (gO a))
 >       QED
 
-< funEqP0 : {cc, dd: Cat} -> (ff, gg: Fun cc dd) ->
+< funEqP0 : {cc, dd: Cat} -> (ff, gg: Func cc dd) ->
 <         (eqO : (FO ff) = (FO gg)) -> 
 <         (eqH : (FH ff) = (FH gg)) ->        
 <         (a : Obj cc) -> FId ff a = FId gg a
-< funEqP0 {cc} {dd} (MkFun fO fH fI fC) (MkFun gO gH gI gC) eqO eqH a = 
-<     (FId (MkFun fO fH fI fC) a)  ={ Refl }=
+< funEqP0 {cc} {dd} (MkFunc fO fH fI fC) (MkFunc gO gH gI gC) eqO eqH a = 
+<     (FId (MkFunc fO fH fI fC) a)  ={ Refl }=
 <     (fI a)                       
 
 
@@ -142,7 +145,7 @@ cong {f = \fObj => fObj a} eqO
            -- eq2 : (Id (fO a)) = (Id (gO a))
            eq2 = cong {f = Id} eqOa
 
-< funEqP1 : {cc, dd: Cat} -> (ff, gg: Fun cc dd) ->
+< funEqP1 : {cc, dd: Cat} -> (ff, gg: Func cc dd) ->
 <         (eqO : (FO ff) = (FO gg)) -> 
 <         (eqH : (FH ff) = (FH gg)) ->        
 <         FId ff = FId gg           -- FId ff : (a : Obj cc) -> (fH (Id a)) = Id (fO a)
@@ -158,7 +161,7 @@ cong {f = \fObj => fObj a} eqO
 <             (FH ff (Id a)) (Id (FO gg a))))} 
 <     (FId ff) (FId gg) (prf {cc = cc} {dd = dd} ff gg eqO eqH)
 <     where
-<       prf : {cc, dd: Cat} -> (ff, gg : Fun cc dd) ->
+<       prf : {cc, dd: Cat} -> (ff, gg : Func cc dd) ->
 <             (eqO : (FO ff) = (FO gg)) -> 
 <             (eqH : (FH ff) = (FH gg)) ->        
 <             (w : Obj cc) -> (FId ff w) = (FId gg w)
@@ -178,27 +181,27 @@ funEqI2 {cc} {dd} {a} fO gO eqO
            (cong {f = \oo => Id (oo a)} eqO) fI gI
 
 
-< funEq : {cc, dd: Cat} -> (ff, gg: Fun cc dd) ->
+< funEq : {cc, dd: Cat} -> (ff, gg: Func cc dd) ->
 <         (eqO : (FO ff) = (FO gg)) -> 
 <         (eqH : (FH ff) = (FH gg)) ->
 <         ff = gg
 
-< funEq {cc} {dd} (MkFun fO fH fI fC) (MkFun gO gH gI gC) eqO eqH =
-<   (MkFun fO fH fI fC)   ={ cong {f = \o => MkFun o fH fI fC} eqO }=
-<   (MkFun gO fH fI fC)   ={ cong {f = \h => MkFun gO h fI fC} eqH }=
-<   (MkFun gO gH fI fC)   ={ cong {f = \i => MkFun gO gH i fC} (UipWT {teq = funEqI fO gO eqO } fI gI) }=
-<   (MkFun gO gH gI fC)   ={ cong {f = \c => MkFun gO gH gI c} (UipWT {teq = funEqC fO gO eqO } fC gC) }=
-<   (MkFun gO gH gI gC)   QED
+< funEq {cc} {dd} (MkFunc fO fH fI fC) (MkFunc gO gH gI gC) eqO eqH =
+<   (MkFunc fO fH fI fC)   ={ cong {f = \o => MkFunc o fH fI fC} eqO }=
+<   (MkFunc gO fH fI fC)   ={ cong {f = \h => MkFunc gO h fI fC} eqH }=
+<   (MkFunc gO gH fI fC)   ={ cong {f = \i => MkFunc gO gH i fC} (UipWT {teq = funEqI fO gO eqO } fI gI) }=
+<   (MkFunc gO gH gI fC)   ={ cong {f = \c => MkFunc gO gH gI c} (UipWT {teq = funEqC fO gO eqO } fC gC) }=
+<   (MkFunc gO gH gI gC)   QED
 
 < funCompAssociative : {aa, bb, cc, dd : Cat} ->  
-<   (ff : Fun cc dd) -> (gg : Fun bb cc) -> (hh : Fun aa bb) ->
+<   (ff : Func cc dd) -> (gg : Func bb cc) -> (hh : Func aa bb) ->
 <   funComp (funComp ff gg) hh = funComp ff (funComp gg hh)
 < funCompAssociative {aa} {bb} {cc} {dd} ff gg hh = 
-<   (MkFun lO lH lI lC)  ={ ?lele {-cong Refl-} }=
-<   (MkFun rO lH lI lC)  ={ ?lulu {-cong Refl-} }=
-<   (MkFun rO rH lI lC)  ={ ?lala {-cong (Uip lI rI)-} }=
-<   (MkFun rO rH rI lC)  ={ ?lulu {-cong (Uip lC rC)-} }=
-<   (MkFun rO rH rI rC)  ={ Refl }=
+<   (MkFunc lO lH lI lC)  ={ ?lele {-cong Refl-} }=
+<   (MkFunc rO lH lI lC)  ={ ?lulu {-cong Refl-} }=
+<   (MkFunc rO rH lI lC)  ={ ?lala {-cong (Uip lI rI)-} }=
+<   (MkFunc rO rH rI lC)  ={ ?lulu {-cong (Uip lC rC)-} }=
+<   (MkFunc rO rH rI rC)  ={ Refl }=
 <   (rhs)                QED  
 <   where
 <     lhs = funComp (funComp ff gg) hh

@@ -4,6 +4,8 @@
 > import Syntax.PreorderReasoning
 
 > %default total
+> %auto_implicits off
+> %access public export
 
 The free category on a directed graph:
 

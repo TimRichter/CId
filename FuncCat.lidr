@@ -1,25 +1,28 @@
-> module FunCat
+> module FuncCat
 > import Category
 > import FunExtAxiom
 > import Prop
 > import Syntax.PreorderReasoning
 
 > %default total
+> %auto_implicits off
+> %access public export
 
 Given two (small) categories cc and dd, we
-have the category of functors Funs cc dd
+have the category of functors Funcs cc dd
 
 identity natural transformation:
 
-> idNT :  (ff : Fun cc dd) -> NT ff ff
+> idNT : {cc, dd : Cat} -> 
+>        (ff : Func cc dd) -> NT ff ff
 > idNT {cc} {dd} ff = MkNT  (cmpId ff) 
 >                           (commSqId ff) where
 >
->   cmpId : (ff: Fun cc dd) -> 
+>   cmpId : (ff: Func cc dd) -> 
 >           (a : Obj cc) -> Hom dd (FO ff a) (FO ff a)
 >   cmpId ff a = Category.Id (FO ff a)
 >
->   commSqId :  (ff: Fun cc dd) -> {a, b : Obj cc} -> (f : Hom cc a b) ->               
+>   commSqId :  (ff: Func cc dd) -> {a, b : Obj cc} -> (f : Hom cc a b) ->               
 >               ((cmpId ff b) ° (FH ff f)) = ((FH ff f) ° (cmpId ff a))
 >   commSqId ff {a} {b} f =
 >     ((cmpId ff b) ° (FH ff f))    ={ Refl }=
@@ -32,7 +35,7 @@ composition of natural transformations:
 
 component maps are composed in dd:
 
-> cmpST : {cc, dd : Cat} -> {ff, gg, hh : Fun cc dd} ->
+> cmpST : {cc, dd : Cat} -> {ff, gg, hh : Func cc dd} ->
 >         (s : NT gg hh) -> (t : NT ff gg) ->
 >         (a : Obj cc) -> Hom dd (FO ff a) (FO hh a)
 > cmpST s t a = (s _ a) ° (t _ a)
@@ -40,7 +43,7 @@ component maps are composed in dd:
 squares commute since they are put together from the commtative squares
 of the transformations being composed
 
-> commSqST :  {cc, dd : Cat} -> {ff, gg, hh : Fun cc dd} ->
+> commSqST :  {cc, dd : Cat} -> {ff, gg, hh : Func cc dd} ->
 >         (s : NT gg hh) -> (t : NT ff gg) ->
 >         {a, b : Obj cc} -> (f : Hom cc a b) ->               
 >         ((cmpST s t b) ° (FH ff f)) = ((FH hh f) ° (cmpST s t a))
@@ -54,7 +57,7 @@ of the transformations being composed
 >   ((FH hh f) ° ((s _ a) ° (t _ a)))  ={ Refl }=
 >   ((FH hh f) ° (cmpST s t a))        QED    
 
-> compNT :  {cc, dd : Cat} -> {ff, gg, hh : Fun cc dd} ->
+> compNT :  {cc, dd : Cat} -> {ff, gg, hh : Func cc dd} ->
 >           NT gg hh -> NT ff gg -> NT ff hh
 > compNT s t = MkNT (cmpST s t) (commSqST s t) 
 
@@ -63,7 +66,7 @@ associativity of compNT
 first the components
 
 > assCLemma : {cc, dd : Cat} -> 
->             {ff, gg, hh, kk: Fun cc dd} ->
+>             {ff, gg, hh, kk: Func cc dd} ->
 >             (t : NT hh kk) -> 
 >             (r : NT gg hh) -> 
 >             (s : NT ff gg) ->
@@ -79,7 +82,7 @@ first the components
 then the squares
 
 > assSqLemma : {cc, dd : Cat} -> 
->             {ff, gg, hh, kk: Fun cc dd} ->
+>             {ff, gg, hh, kk: Func cc dd} ->
 >             (t : NT hh kk) -> 
 >             (r : NT gg hh) -> 
 >             (s : NT ff gg) ->
@@ -94,9 +97,9 @@ then the squares
 
 
 
-> FunCat : (cc, dd : Cat) -> Cat
-> FunCat cc dd = MkCat
->   (Fun cc dd) (NT {cc} {dd}) (idNT {cc} {dd}) (compNT {cc} {dd}) ?ass ?idPre ?idPost 
+> FuncCat : (cc, dd : Cat) -> Cat
+> FuncCat cc dd = MkCat
+>   (Func cc dd) (NT {cc} {dd}) (idNT {cc} {dd}) (compNT {cc} {dd}) ?ass ?idPre ?idPost 
 
 
 

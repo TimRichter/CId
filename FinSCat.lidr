@@ -5,6 +5,8 @@
 > import Syntax.PreorderReasoning
 
 > %default total
+> %auto_implicits off
+> %access public export
 
 The sceleton of the category of finite sets with
 objects Fin n for n in Nat

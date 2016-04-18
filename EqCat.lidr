@@ -2,6 +2,8 @@
 > import Category
 > import Prop
 > %default total
+> %auto_implicits off
+> %access public export
 
 Each Idris type A forms a category where the class of
 objects is A and Hom x y = (x = y)

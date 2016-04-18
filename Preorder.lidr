@@ -3,6 +3,8 @@
 > import Syntax.PreorderReasoning
 
 > %default total
+> %auto_implicits off
+> %access public export
 
 Preorders, partial orders, linear orders
 ========================================
@@ -49,13 +51,13 @@ and the "all" relation:
 prefix order on lists 
 (we need the element type to have a decidable equality)
 
-> lPre : DecEq a => BinRelB (List a)
-> lPre []      _       = True
-> lPre (x::xs) []      = False
-> lPre (x::xs) (y::ys) 
->   with (decEq x y)
->   | Yes _ = lPre xs ys
->   | No  _ = False
+< lPre : DecEq a => BinRelB (List a)
+< lPre []      _       = True
+< lPre (x::xs) []      = False
+< lPre (x::xs) (y::ys) 
+<   with (decEq x y)
+<   | Yes _ = lPre xs ys
+<   | No  _ = False
 
 But properties of relations are difficult to implement, e.g.:
 
@@ -112,8 +114,7 @@ the "all" relation:
 Preorder
 --------
 
-To model a preordered set ("quasigeordnete Menge" in the
-lecture):
+To model a preordered set:
 
 > data Preorder : Type where
 >   MkPreorder :  {- the set is modeled as a type -}

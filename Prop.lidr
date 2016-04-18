@@ -1,6 +1,8 @@
 > module Prop
 
 > %default total
+> %auto_implicits off
+> %access public export
 
 A type is called a proposition iff any two inhabitants of
 the type are equal:
@@ -61,7 +63,7 @@ Praedicates
 The Sigma type of a Praedicate over A is a Subset
 
 > SubSet : {A : Type} -> Praed A -> Type
-> SubSet {A} (MkPraed P _) = Sigma A P
+> SubSet {A} (MkPraed P _) = ( a : A ** P a)
 
 > EmptyPraed : {A : Type} -> Praed A
 > EmptyPraed = MkPraed (\a => Void) (\a => VoidIsProp) 

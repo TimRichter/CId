@@ -1,6 +1,8 @@
 > module FunExtAxiom
 
 > %default total
+> %auto_implicits off
+> %access public export
 
 If needed, we'll add function extensionality as an axiom
 

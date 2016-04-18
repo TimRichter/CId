@@ -2,6 +2,8 @@
 > import Category
 
 > %default total
+> %auto_implicits off
+> %access public export
 
 Idris types with functions form a category
 ------------------------------------------

@@ -4,7 +4,7 @@ a little category theory in Idris
 This is an attempt to formalize some elementary category
 theory in Idris. Let's see how far we get.
 
-Typechecks (mostly, see below) in Idris Version 0.10
+Typechecks (mostly, see below) in Idris Version 0.11
 
 ## What's in the files:
 
@@ -40,8 +40,8 @@ to have function extensionality.
 ### DecProp.lidr
 
 Attempt to model decidable propositions using interfaces.
-Doesn't typecheck.
-Not really used so far...
+Overlapping implementation... 
+Not used anywhere...
 
 ### Prop.lidr
 
@@ -53,9 +53,9 @@ Preorders (without Categories). May be unnecessary.
 
 ### FunExtAxiom.lidr
 
-Function extensionality axiom. Needed for FunCat and CatCat.
+Function extensionality axiom. Needed for FuncCat and CatCat.
 
-### FunCat.lidr
+### FuncCat.lidr
 
 Functor category ... incomplete.
 

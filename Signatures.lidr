@@ -2,6 +2,8 @@
 > import Data.Vect
 
 > %default total
+> %auto_implicits off
+> %access public export
 
 A signature is just a type family over |Nat|,
 the n-ary symbols in Signature |sig| being

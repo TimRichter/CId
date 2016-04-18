@@ -1,6 +1,8 @@
 > module Category
 
 > %default total
+> %auto_implicits off
+> %access public export
 
 Basic definitions of category theory 
 ====================================
@@ -72,8 +74,10 @@ the rest of the getters can have cc as an implicit argument...
 Functor
 -------
 
-> data Fun : (cc : Cat) -> (dd : Cat) -> Type where
->   MkFun : {- Object map -}
+> data Func : (cc : Cat) -> (dd : Cat) -> Type where
+>   MkFunc : 
+>        {cc , dd : Cat} -> 
+>           {- Object map -}
 >        (FO : Obj cc -> Obj dd) ->
 >           {- Homomorphism map -}
 >        (FH : {a, b : Obj cc} ->
@@ -84,37 +88,39 @@ Functor
 >        (FC : {a, b, c: Obj cc} ->
 >              (f : Hom cc b c) -> (g : Hom cc a b) ->
 >              (FH (f ° g) = (FH f) ° (FH g))) ->
->        Fun cc dd
+>        Func cc dd
 
 getters
 
-> FO :  {cc, dd : Cat} -> (Fun cc dd) ->
+> FO :  {cc, dd : Cat} -> (Func cc dd) ->
 >         Obj cc -> Obj dd
-> FO  (MkFun fo _ _ _) = fo
+> FO  (MkFunc fo _ _ _) = fo
 
 > FH :  {cc, dd : Cat} -> {a, b : Obj cc} ->
->         (ff : Fun cc dd) -> Hom cc a b -> 
+>         (ff : Func cc dd) -> Hom cc a b -> 
 >         Hom dd (FO ff a) (FO ff b)
-> FH (MkFun _ fh _ _) = fh
+> FH (MkFunc _ fh _ _) = fh
 
-> FId : {cc, dd : Cat} -> (ff : Fun cc dd) -> 
+> FId : {cc, dd : Cat} -> (ff : Func cc dd) -> 
 >       (a : Obj cc) -> (FH ff (Id a) = Id (FO ff a))
-> FId (MkFun _ _ fi _) = fi
+> FId (MkFunc _ _ fi _) = fi
 
 > FC :  {cc, dd : Cat} -> 
 >       {a, b, c : Obj cc} ->
->       (ff : Fun cc dd) ->
+>       (ff : Func cc dd) ->
 >       (f : Hom cc b c) -> (g : Hom cc a b) ->
 >       FH ff (f ° g) = (FH ff f) ° (FH ff g)
-> FC  (MkFun _ _ _ fc) = fc
+> FC  (MkFunc _ _ _ fc) = fc
 
 
 Natural transformation
 ----------------------
 
 > data NT : {cc, dd : Cat} ->
->           (ff, gg : Fun cc dd) -> Type where
->   MkNT : {- Component maps -}
+>           (ff, gg : Func cc dd) -> Type where
+>   MkNT : 
+>       {cc, dd : Cat} -> {ff, gg : Func cc dd} ->
+>          {- Component maps -}
 >       (Cmp : (a: Obj cc) -> Hom dd (FO ff a) (FO gg a)) ->
 >          {- Commutative squares -}
 >       (CommSq : {a, b : Obj cc} ->
@@ -127,11 +133,11 @@ Natural transformation
 
 getters
 
-> NTC : {cc, dd : Cat} -> {ff, gg : Fun cc dd} ->
+> NTC : {cc, dd : Cat} -> {ff, gg : Func cc dd} ->
 >         NT ff gg -> (a: Obj cc) -> Hom dd (FO ff a) (FO gg a)
 > NTC (MkNT cmp _) = cmp
 
-> NTSq :  {cc, dd : Cat} -> {ff, gg : Fun cc dd} -> 
+> NTSq :  {cc, dd : Cat} -> {ff, gg : Func cc dd} -> 
 >         {a, b : Obj cc} -> 
 >         (eta : NT ff gg) -> (f : Hom cc a b) ->
 >         ((NTC eta b) ° (FH {dd} ff f)) = 

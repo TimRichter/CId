@@ -4,6 +4,10 @@
 
 > %default total 
 
+ %auto_implicits off
+
+> %access public export
+
 decidable props, praedicates a.s.o. with type interfaces
 =====================================================
 

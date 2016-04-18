@@ -3,6 +3,8 @@
 > import Control.Isomorphism
 >
 > %default total
+> %auto_implicits off
+> %access public export
 
 > uncurrySigma : 
 >             {A : Type} -> {B : A -> Type} -> {C : Type} ->

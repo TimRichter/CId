@@ -1,6 +1,8 @@
 > module Graph
 
 > %default total
+> %auto_implicits off
+> %access public export
 
 directed Graphs:
 
