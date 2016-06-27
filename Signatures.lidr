@@ -1,5 +1,6 @@
 > module Signatures
 > import Data.Vect
+> import Syntax.PreorderReasoning
 
 > %default total
 > %auto_implicits off
@@ -30,13 +31,83 @@ We could have written
 
 < data Term : Sig -> Sig
 
-Indeed, we'll show that Sig is a category and
-Term is a monad on Sig:
+Indeed, we'll show that Sig is a category and Term is a monad 
+on Sig.:
 
-Morphisms of Sig:
+morphisms of Sig:
 
 > SigMor : Sig -> Sig -> Type
 > SigMor s t = (n : Nat) -> s n -> t n
+
+identity signature morphisms:
+
+> idSigMor : {s : Sig} -> SigMor s s
+> idSigMor = (\n => id)
+
+composition of signature morphisms
+
+> compSigMor : 
+>   {s, t, u : Sig} ->
+>   SigMor t u ->
+>   SigMor s t ->
+>   SigMor s u 
+> compSigMor {s} {t} {u} f g = comp where
+>   comp : (n : Nat) -> s n -> u n
+>   comp = \n => (\sSymb => f n (g n sSymb))
+
+associativity
+
+> assCompSigMor : 
+>   {s, t, u, v : Sig} ->
+>   (f : SigMor u v) ->
+>   (g : SigMor t u) ->
+>   (h : SigMor s t) ->
+>   compSigMor (compSigMor f g) h = compSigMor f (compSigMor g h)
+> assCompSigMor f g h = Refl
+
+identity precomposition is neutral
+
+> eta : {a, b : Type} ->
+>   (f : a -> b) ->
+>   f = (\x => f x)
+> eta f = Refl
+
+> etaD : {a : Type} ->
+>   {b : a -> Type} ->
+>   (f : (x : a) -> b x) ->
+>   f = (\x => f x)
+> etaD f = Refl
+
+> eta2 : {a, b, c : Type} ->
+>   (f : a -> b -> c) ->
+>   f = (\x => (\y => (f x) y))
+> eta2 f = Refl
+
+
+
+> etaNested : {a : Type} ->
+>   {b, c : a -> Type} ->
+>   (f : (x : a) -> b x -> c x) ->
+>   (x : a) ->
+>   f x = \sSymb => f x sSymb
+> etaNested f x = Refl
+
+
+ idPreCompSigMor :
+   {s, t : Sig} ->
+   (f : SigMor s t) ->
+   compSigMor f idSigMor = f
+ idPreCompSigMor f = 
+   (compSigMor f idSigMor)
+   ={ Refl }= 
+   (\n => (\sSymb => (f n) sSymb))
+   ={ sym (eta (f n)) }=
+   (\n => f n)
+   ={ Refl }=
+   f
+   QED
+
+
 
 Term is a functor
 
@@ -51,9 +122,8 @@ Term is a functor
 
 and a monad... need preparations for this:
 
- Since Terms have Pr i at the leaves, it is
- easy to weaken an n-Term to an (S n)-Term by adding a 
- dummy variable
+ Since Terms have (Pr i) at the leaves, it is  easy to weaken an 
+ n-Term to an (S n)-Term by adding a dummy variable
 
 > weakenT : {s : Sig} -> {n : Nat} -> Term s n -> Term s (S n)
 > weakenT (Pr {n} i {smaller=sm}) = Pr {n = S n} i {smaller = lteSuccRight sm} 
@@ -76,10 +146,10 @@ and a monad... need preparations for this:
   we need:
 
 > natToFin' : {n : Nat} -> (i : Nat) -> {auto smaller: i `LT` n} -> Fin n
-> natToFin' {n = Z}    i {smaller}  = absurd smaller
-> natToFin' {n = S n}  Z            = FZ 
+> natToFin' {n = Z}    i {smaller}   = absurd smaller
+> natToFin' {n = S n}  Z             = FZ 
 > natToFin' {n = S n} (S i) {smaller = LTESucc sm} 
->                                   = FS (natToFin' {n} i {smaller = sm}) 
+>                                    = FS (natToFin' {n} i {smaller = sm}) 
 
 Now we can define the unit of the Term monad:
 
@@ -90,10 +160,10 @@ and its multiplication
 
 > multT : {s: Sig} -> SigMor (Term (Term s)) (Term s)
 > multT {s} n (Pr i) = Pr i
-> multT {s} n ((Pr j) ::: termsTT_n_m) = multT {s} n (index (natToFin' j) termsTT_n_m)
+> multT {s} n ((Pr j) ::: termsTT_n_m) = 
+>   multT {s} n (index (natToFin' j) termsTT_n_m)
 > multT {s} n ((symb_l ::: termsT_m_l) ::: termsTT_n_m) =
->     symb_l ::: map (\ term_m => multT {s} n (term_m ::: termsTT_n_m)) termsT_m_l
-
+>   symb_l ::: map (\ term_m => multT {s} n (term_m ::: termsTT_n_m)) termsT_m_l
 
 > revbindT : 
 >   {s, t : Sig} ->
@@ -101,8 +171,12 @@ and its multiplication
 >   SigMor (Term s) (Term t)
 > revbindT {s} {t} f n termTS_n = multT {s=t} n (fmapT f n termTS_n) 
 
-
-
+> compKleisliT :
+>   {s, t, u : Sig} ->
+>   SigMor t (Term u) ->
+>   SigMor s (Term t) ->
+>   SigMor s (Term u)
+> compKleisliT {s} {t} {u} f g = compSigMor (multT {s=u}) (compSigMor (fmapT f)  g) 
 
 
 
