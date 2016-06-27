@@ -8,22 +8,28 @@
 > %auto_implicits off
 > %access public export
 
-Given two (small) categories cc and dd, we
-have the category of functors Funcs cc dd
+Given two (small) categories cc and dd, we have 
+the category of functors Funcs cc dd
 
 identity natural transformation:
 
 > idNT : {cc, dd : Cat} -> 
 >        (ff : Func cc dd) -> NT ff ff
-> idNT {cc} {dd} ff = MkNT  (cmpId ff) 
->                           (commSqId ff) where
+> idNT {cc} {dd} ff = 
+>   MkNT  (cmpId ff) (commSqId ff) where
 >
 >   cmpId : (ff: Func cc dd) -> 
->           (a : Obj cc) -> Hom dd (FO ff a) (FO ff a)
+>           (a : Obj cc) -> 
+>           Hom dd (FO ff a) (FO ff a)
+>
 >   cmpId ff a = Category.Id (FO ff a)
 >
->   commSqId :  (ff: Func cc dd) -> {a, b : Obj cc} -> (f : Hom cc a b) ->               
+>
+>   commSqId :  (ff: Func cc dd) -> 
+>               {a, b : Obj cc} -> 
+>               (f : Hom cc a b) ->               
 >               ((cmpId ff b) ° (FH ff f)) = ((FH ff f) ° (cmpId ff a))
+>
 >   commSqId ff {a} {b} f =
 >     ((cmpId ff b) ° (FH ff f))    ={ Refl }=
 >     ((Id (FO ff b)) ° (FH ff f))  ={ IdPost (FH ff f) }=
@@ -35,18 +41,27 @@ composition of natural transformations:
 
 component maps are composed in dd:
 
-> cmpST : {cc, dd : Cat} -> {ff, gg, hh : Func cc dd} ->
->         (s : NT gg hh) -> (t : NT ff gg) ->
->         (a : Obj cc) -> Hom dd (FO ff a) (FO hh a)
+> cmpST : {cc, dd : Cat} -> 
+>         {ff, gg, hh : Func cc dd} ->
+>         (s : NT gg hh) -> 
+>         (t : NT ff gg) ->
+>         (a : Obj cc) -> 
+>         Hom dd (FO ff a) (FO hh a)
+>
 > cmpST s t a = (s _ a) ° (t _ a)
 
 squares commute since they are put together from the commtative squares
 of the transformations being composed
 
-> commSqST :  {cc, dd : Cat} -> {ff, gg, hh : Func cc dd} ->
->         (s : NT gg hh) -> (t : NT ff gg) ->
->         {a, b : Obj cc} -> (f : Hom cc a b) ->               
->         ((cmpST s t b) ° (FH ff f)) = ((FH hh f) ° (cmpST s t a))
+> commSqST :  
+>   {cc, dd : Cat} -> 
+>   {ff, gg, hh : Func cc dd} ->
+>   (s : NT gg hh) -> 
+>   (t : NT ff gg) ->
+>   {a, b : Obj cc} -> 
+>   (f : Hom cc a b) ->               
+>   ((cmpST s t b) ° (FH ff f)) = ((FH hh f) ° (cmpST s t a))
+>
 > commSqST {ff} {gg} {hh} s t {a} {b} f = 
 >   ((cmpST s t b) ° (FH ff f))        ={ Refl }=
 >   (((s _ b) ° (t _ b)) ° (FH ff f))  ={ Ass (s _ b) (t _ b) (FH ff f) }=
@@ -57,44 +72,52 @@ of the transformations being composed
 >   ((FH hh f) ° ((s _ a) ° (t _ a)))  ={ Refl }=
 >   ((FH hh f) ° (cmpST s t a))        QED    
 
-> compNT :  {cc, dd : Cat} -> {ff, gg, hh : Func cc dd} ->
->           NT gg hh -> NT ff gg -> NT ff hh
+> compNT :  
+>   {cc, dd : Cat} -> 
+>   {ff, gg, hh : Func cc dd} ->
+>   NT gg hh -> 
+>   NT ff gg -> 
+>   NT ff hh
+>
 > compNT s t = MkNT (cmpST s t) (commSqST s t) 
+
 
 associativity of compNT
 
 first the components
 
-> assCLemma : {cc, dd : Cat} -> 
->             {ff, gg, hh, kk: Func cc dd} ->
->             (t : NT hh kk) -> 
->             (r : NT gg hh) -> 
->             (s : NT ff gg) ->
->             NTC (compNT (compNT t r) s) = NTC (compNT t (compNT r s))
+> assCLemma : 
+>   {cc, dd : Cat} -> 
+>   {ff, gg, hh, kk: Func cc dd} ->
+>   (t : NT hh kk) -> 
+>   (r : NT gg hh) -> 
+>   (s : NT ff gg) ->
+>    NTC (compNT (compNT t r) s) = NTC (compNT t (compNT r s))
+>
 > assCLemma {cc} {dd} {ff} {gg} {hh} {kk} t r s = 
->     funextD {A = Obj cc} 
->             {B1 = \a => Hom dd (FO ff a) (FO kk a)}
->             {B2 = \a => Hom dd (FO ff a) (FO kk a)} 
->             (NTC (compNT (compNT t r) s))
->             (NTC (compNT t (compNT r s)))
->             (\a => Ass (t _ a) (r _ a) (s _ a))
+>   funextD {A = Obj cc} 
+>           {B1 = \a => Hom dd (FO ff a) (FO kk a)}
+>           {B2 = \a => Hom dd (FO ff a) (FO kk a)} 
+>           (NTC (compNT (compNT t r) s))
+>           (NTC (compNT t (compNT r s)))
+>           (\a => Ass (t _ a) (r _ a) (s _ a))
 
 then the squares
 
-> assSqLemma : {cc, dd : Cat} -> 
->             {ff, gg, hh, kk: Func cc dd} ->
->             (t : NT hh kk) -> 
->             (r : NT gg hh) -> 
->             (s : NT ff gg) ->
->             NTSq (compNT (compNT t r) s) = NTSq (compNT t (compNT r s))
-> assSqLemma {cc} {dd} {ff} {gg} {hh} {kk} t r s =  
->     funextD {A = Hom cc a b}
->             
->             (NTSq (compNT (compNT t r) s))
->             (NTSq (compNT t (compNT r s)))
->             (\f => Uip ())
+> assSqLemma : 
+>   {cc, dd : Cat} -> 
+>   {ff, gg, hh, kk: Func cc dd} ->
+>   (t : NT hh kk) -> 
+>   (r : NT gg hh) -> 
+>   (s : NT ff gg) ->
+>   NTSq (compNT (compNT t r) s) = NTSq (compNT t (compNT r s))
+>
+> assSqLemma {cc} {dd} {ff} {gg} {hh} {kk} t r s = ?lala  
 
-
+   funextD {A = Hom cc a b}            
+           (NTSq (compNT (compNT t r) s))
+           (NTSq (compNT t (compNT r s)))
+           (\f => Uip ())
 
 
 > FuncCat : (cc, dd : Cat) -> Cat
